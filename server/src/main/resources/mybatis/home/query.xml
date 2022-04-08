@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mangonw.server.home.Dao">
+    <resultMap id="webMailVo" type="com.mangonw.server.mail.WebMailVO">
+        <result column="mailbox_id"					property="mailboxId" 				/>
+        <result column="mail_uid"					property="mailUid" 					/>
+        <result column="mail_is_answered"			property="mailIsAnswered" 			/>
+        <result column="mail_body_start_octet"		property="mailBodyStartOctet" 		/>
+        <result column="mail_content_octets_count"	property="mailContentOctetsCount" 	/>
+        <result column="mail_is_deleted"			property="mailIsDeleted" 			/>
+        <result column="mail_is_draft"				property="mailIsDraft" 				/>
+        <result column="mail_is_flagged"			property="mailIsFlagged" 			/>
+        <result column="mail_date"					property="mailDate" 				/>
+        <result column="mail_mime_type"				property="mailMimeType" 			/>
+        <result column="mail_modseq"				property="mailModseq" 				/>
+        <result column="mail_is_recent"				property="mailIsRecent" 			/>
+        <result column="mail_is_seen"				property="mailIsSeen" 				/>
+        <result column="mail_mime_subtype"			property="mailMimeSubtype" 			/>
+        <result column="mail_textual_line_count"	property="mailTextualLineCount" 	/>
+        <result column="mail_bytes"					property="mailBytes" 				/>
+        <result column="header_bytes"				property="headerBytes" 				/>
+        <result column="mail"						property="mail" 					/>
+        <result column="heade"						property="header" 					/>
+        <result column="mailbox_dtl_cd"				property="mailboxDtlCd" 			/>
+        <result column="boundary"					property="boundary" 				/>
+
+        <result column="property_id"				property="propertyId" 				/>
+        <result column="property_line_number"		property="propertyLineNumber" 		/>
+        <result column="property_local_name"		property="propertyLocalName" 		/>
+        <result column="property_name_space"		property="propertyNameSpace" 		/>
+        <result column="property_value"				property="propertyValue" 			/>
+
+        <result column="receiver_email"				property="receiverEmail" 			/>
+        <result column="reference_email"			property="referenceEmail" 			/>
+        <result column="hidden_reference_email"		property="hiddenReferenceEmail" 	/>
+
+        <result column="file_path"					property="filePath" 				/>
+        <result column="file_name"					property="fileName" 				/>
+        <result column="file_code"					property="fileCode" 				/>
+        <result column="atc_file_cd"				property="atcFileCd" 				/>
+        <result column="file_size"					property="fileSize" 				/>
+
+        <result column="has_atc"					property="hasAtc" 					/>
+
+        <result column="retrieval_target"			property="retrievalTarget" 			/>
+
+        <result column="atc_file"					property="atcFile" 					/>
+        <result column="atc_boundary"				property="atcBoundary" 				/>
+
+        <result column="sender_nm"					property="senderNm" 				/>
+        <result column="sender_email"				property="senderEmail" 				/>
+        <result column="mail_to"					property="mailTo" 					/>
+        <result column="subjects"					property="subjects" 				/>
+        <result column="contents"					property="content" 					/>
+
+        <result column="set_nm"						property="setNm" 					/>
+        <result column="set_val"					property="setVal" 					/>
+
+        <result column="mailbox_name"				property="mailboxName" 				/>
+        <result column="user_name"					property="userName" 				/>
+
+        <result column="enc_type"					property="encType" 					/>
+
+        <result column="inline_yn"					property="inlineYn" 				/>
+
+        <result column="cid"						property="cid" 						/>
+
+        <result column="absence_Yn"					property="absenceYn" 				/>
+        <result column="absence_From_Dt"			property="absenceFromDt" 			/>
+        <result column="absence_To_Dt"				property="absenceToDt" 				/>
+        <result column="absence_Msg_Sub"			property="absenceMsgSub" 			/>
+        <result column="absence_Msg_Ctx"			property="absenceMsgCtx" 			/>
+
+        <result column="withdraw_yn"				property="withdrawYn" 				/>
+        <result column="seen_date"					property="seenDate" 				/>
+
+        <result column="admin_yn"					property="adminYn" 					/>
+
+        <result column="list_size"					property="listSize" 				/>
+        <result column="rn"					        property="rn" 				/>
+    </resultMap>
+
+    <select id="test" resultMap="webMailVo">
+        select mail_bytes, header_bytes, property_value boundary
+        from james_mail, james_mail_property
+        where james_mail.mailbox_id = #{mailboxId}::bigint
+        and james_mail.mail_uid = ${mailUid}::bigint
+        and james_mail.mailbox_id = james_mail_property.mailbox_id
+        and james_mail.mail_uid = james_mail_property.mail_uid
+        and property_local_name = 'boundary'
+    </select>
+
+    <insert id="insertMailAtcFile">
+        INSERT INTO public.mail_atc
+        (
+        mailbox_id,
+        mail_uid,
+        seq,
+        file_path,
+        file_url,
+        file_code,
+        file_name,
+        file_size,
+        inline_yn,
+        cid,
+        system_mail
+        )
+        SELECT
+        #{mailboxId}::bigint,
+        #{mailUid}::bigint,
+        coalesce((select max(seq) from public.mail_atc where mailbox_id = #{mailboxId}::bigint and mail_uid = #{mailUid}::bigint),0)+1,
+        #{filePath},
+        #{fileUrl},
+        #{fileCode},
+        #{fileName},
+        #{fileSize},
+        #{inlineYn},
+        #{cid},
+        #{systemMail}
+    </insert>
+
+    <update id="updateNotProcessedMail">
+        update public.james_mail
+        set mail_is_processed = false
+        ,process_stat = #{s}
+        where (mailbox_id, mail_uid) in
+        (
+            select mailbox_id, mail_uid
+            from james_mail
+            where mail_is_processed is null
+            and process_stat is null
+            order by mail_date
+            limit 120
+        )
+        ;
+    </update>
+
+    <select id="selectNotProcessedMail" resultMap="webMailVo">
+
+        select
+
+        mail.mail
+        ,mail.heade
+        ,mail.boundary
+
+        ,mail.mail_is_seen
+        ,mail.mail_is_deleted
+        ,mail.has_atc
+
+        ,mail.mailbox_id
+        ,mail.mail_uid
+
+        ,mail.mail_date
+
+        ,mail.mail_is_answered
+        ,mail.mail_bytes
+        ,mail.header_bytes
+        ,retr.retrieval_target
+
+        ,mail.mailbox_name
+        ,mail.user_name
+
+        ,mail.enc_type
+
+        ,replace(split_part(encode(mail.header_bytes,'escape'),'Subject: ',2),'	','') subjects
+        ,row_number() over(order by mail_date) rn
+        from(
+        SELECT
+
+        prop3.property_value enc_type
+        ,prop2.property_value boundary
+        ,prop.property_value::text has_atc
+        ,split_part(encode(mail_bytes, 'escape'),split_part(split_part(encode(header_bytes, 'escape'), 'boundary="', 2),'"',1),2) inner_mail
+        ,encode(mail_bytes, 'escape') mail
+        ,encode(header_bytes, 'escape') heade
+
+        ,mail_is_seen::text mail_is_seen
+
+        ,mail.mailbox_id
+        ,mail.mail_uid
+
+        ,mail.mail_is_answered
+
+        ,mail.mail_date
+
+        ,mail.mail_bytes
+        ,mail.header_bytes
+
+        ,mail.mail_uid uid
+        ,mail.mail_is_deleted
+        ,mailbox.mailbox_name
+        ,mailbox.user_name
+
+        FROM
+        public.james_mail mail
+        left join
+        (select * from public.james_mail_property where upper(property_local_name) = upper('boundary')) prop2
+        on mail.mailbox_id = prop2.mailbox_id and mail.mail_uid = prop2.mail_uid
+        left join
+        (select * from public.james_mail_property where upper(property_local_name) = upper('Content-Transfer-Encoding')) prop3
+        on mail.mailbox_id = prop3.mailbox_id and mail.mail_uid = prop3.mail_uid
+        ,(select * from public.james_mail_property where upper(property_local_name) = upper('HAS_ATTACHMENT')) prop
+        ,james_mailbox mailbox
+        where mail.mailbox_id = prop.mailbox_id and mail.mail_uid = prop.mail_uid
+        and mail.mailbox_id = mailbox.mailbox_id
+        and mail.mail_is_processed = false
+        and process_stat = #{s}
+        <!-- 			and mail.mailbox_id = 1 and mail.mail_uid = 85 -->
+        )mail
+        left join
+        (
+        SELECT
+        mail.mailbox_id, mail.mail_uid uid, string_agg(prop.mailbox_id||','||prop.mail_uid,'and') retrieval_target
+        FROM public.james_mail mail ,public.james_mail_property prop
+        where mail.mailbox_id != prop.mailbox_id and prop.property_local_name = 'boundary' and prop.property_value = split_part(split_part(encode(header_bytes, 'escape'), 'boundary="', 2),'"',1)
+        group by mail.mailbox_id, mail.mail_uid
+        )retr
+        on mail.uid = retr.uid and mail.mailbox_id = retr.mailbox_id
+        order by mail_date
+    </select>
+
+    <resultMap id="mailboxInfoVO" type="com.mangonw.server.mail.MailboxInfoVO">
+        <result column="user_mail"					property="userMail" 			/>
+        <result column="mailbox_cd"					property="mailboxCd" 			/>
+        <result column="mailbox_nm"					property="mailboxNm" 			/>
+        <result column="mailbox_type"				property="mailboxType" 			/>
+        <result column="mailbox_level"				property="mailboxLevel" 		/>
+        <result column="high_level_map"				property="highLevelMap" 		/>
+        <result column="ordr"						property="ordr" 				/>
+
+        <result column="mail_cnt"					property="mailCnt" 				/>
+        <result column="mailbox_storage"			property="mailboxStorage" 		/>
+        <result column="lower_menu_cnt"				property="lowerMenuCnt" 		/>
+
+        <result column="set_nm"						property="setNm" 				/>
+        <result column="set_val"					property="setVal" 				/>
+        <result column="mailbox_password"			property="mailboxPW" 			/>
+    </resultMap>
+
+    <select id="selectBoxSetting" resultMap="mailboxInfoVO">
+        SELECT user_mail, mailbox_cd, mailbox_nm, ordr
+        ,case
+        when sender_val is not null 	and sender_val !='' 	then '보낸이'
+        when cc_val is not null 		and cc_val !='' 		then '참조'
+        when subject_val is not null 	and subject_val !='' 	then '제목'
+        when content_val is not null 	and content_val !='' 	then '내용'
+        end set_nm
+        ,case
+        when sender_val is not null 	and sender_val !='' 	then sender_val
+        when cc_val is not null 		and cc_val !='' 		then cc_val
+        when subject_val is not null 	and subject_val !='' 	then subject_val
+        when content_val is not null 	and content_val !='' 	then content_val
+        end set_val
+
+        FROM public.mailbox_info_dtl
+        WHERE user_mail = #{email}
+        ORDER BY ordr;
+    </select>
+
+    <insert id="mailDataError">
+        INSERT INTO public.mail_data_error
+        (
+        mailbox_id,
+        mail_uid,
+        subject,
+        content,
+        contenttest,
+        sender_nm,
+        sender_email,
+        mail_to,
+        cc,
+        retrieval_target,
+        mail_date,
+        mail_is_seen,
+        mail_is_deleted,
+        has_atc,
+        mailbox_dtl_cd,
+        err_memo
+        )
+        VALUES
+        (
+        #{mailboxId}::bigint,
+        #{mailUid}::bigint,
+        #{subject},
+        #{byteContent},
+        #{content},
+        #{senderNm},
+        #{senderEmail},
+        #{mailTo},
+        #{cc},
+        #{retrievalTarget},
+        to_timestamp(#{mailDate},'yyyy-mm-dd HH24:mi:SS.ms'),
+        #{mailIsSeen}::boolean,
+        #{mailIsDeleted}::boolean,
+        #{hasAtc}::boolean,
+        #{mailboxDtlCd},
+        #{errMemo}
+        );
+    </insert>
+
+    <insert id="mailDataProcessing">
+        INSERT INTO public.mail_data
+        (
+        mailbox_id,
+        mail_uid,
+        subject,
+        content,
+        contenttest,
+        sender_nm,
+        sender_email,
+        mail_to,
+        cc,
+        retrieval_target,
+        mail_date,
+        mail_is_seen,
+        mail_is_deleted,
+        has_atc,
+        mailbox_dtl_cd,
+        mail_is_withdrew,
+        process_stat
+        )
+        VALUES
+        (
+        #{mailboxId}::bigint,
+        #{mailUid}::bigint,
+        #{subject},
+        #{byteContent},
+        #{content},
+        #{senderNm},
+        #{senderEmail},
+        #{mailTo},
+        #{cc},
+        #{retrievalTarget},
+        to_timestamp(#{mailDate},'yyyy-mm-dd HH24:mi:SS.ms'),
+        #{mailIsSeen}::boolean,
+        #{mailIsDeleted}::boolean,
+        #{hasAtc}::boolean,
+        coalesce(#{mailboxDtlCd},'-1'),
+        false,
+        #{processStat}
+        );
+    </insert>
+
+    <update id="mailProUpdate">
+        UPDATE public.james_mail
+        SET mail_is_processed=true
+        ,process_stat = 'done'
+        WHERE mailbox_id = #{mailboxId}::bigint
+        and mail_uid = #{mailUid}::bigint;
+    </update>
+
+    <select id="absenceUser" resultMap="webMailVo">
+        select
+        a.user_name sender_email,
+        a.set_val absence_Yn,
+        fromDt.set_val absence_From_Dt,
+        toDt.set_val absence_To_Dt,
+        subject.set_val subject,
+        contents.set_val contents,
+        #{senderEmail} receiver_email
+        FROM
+        user_settings a
+        ,user_settings fromDt
+        ,user_settings toDt
+        ,user_settings subject
+        ,user_settings contents
+        where 1=1
+        and a.user_name = fromDt.user_name
+        and a.user_name = toDt.user_name
+        and a.user_name = subject.user_name
+        and a.user_name = contents.user_name
+        and a.set_nm = 'absenceYn'
+        and fromDt.set_nm = 'absenceFromDt'
+        and toDt.set_nm = 'absenceToDt'
+        and subject.set_nm = 'absenceMsgSub'
+        and contents.set_nm = 'absenceMsgCtx'
+        and a.set_val = 'Y'
+
+        and a.user_name != #{senderEmail}
+        and a.user_name = (select user_name from james_mailbox where mailbox_id = #{mailboxId}::bigint)
+        and #{mailDate} between fromDt.set_val and toDt.set_val
+        limit 1;
+    </select>
+
+    <select id="selectFile" resultMap="webMailVo">
+        select * from mail_atc where file_path like '%/'||#{yyyy}||'/'||#{mm}||'/' and file_code = #{fileCode}
+    </select>
+
+
+</mapper>
+
