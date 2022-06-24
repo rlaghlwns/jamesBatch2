@@ -17,10 +17,10 @@ class Controller {
     @Autowired
     private lateinit var service: Service
 
-    @GetMapping("test")
+    /*@GetMapping("test")
     fun test() {
         service.test()
-    }
+    }*/
 
     @GetMapping("inline/{yyyy}/{mm}/{fileCode}")
     fun inline(

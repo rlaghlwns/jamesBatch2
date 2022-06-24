@@ -13,7 +13,7 @@ import javax.mail.internet.MimeMessage
 open class MailSender {
 
     companion object {
-        private const val SMTP_ADDR = "117.52.20.181"
+        private const val SMTP_ADDR = "121.254.254.16"
     }
 
     fun send(requestVO: WebMailVO): Int {

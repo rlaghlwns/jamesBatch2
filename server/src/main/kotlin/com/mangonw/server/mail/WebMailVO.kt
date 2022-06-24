@@ -68,4 +68,5 @@ data class WebMailVO(
 	var encStr: String = "",
 	var processStat: String = "",
 	var rn: Int = 0,
+	var singlePart: Boolean = true,
 )

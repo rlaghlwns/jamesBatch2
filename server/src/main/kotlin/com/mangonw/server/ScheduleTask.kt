@@ -32,7 +32,7 @@ class ScheduleTask {
     @Autowired
     private lateinit var service: Service
 
-    @Scheduled(fixedDelay = 1000 * 10 * 1)
+    @Scheduled(fixedDelay = 1000 * 60 * 1)
     fun task2() {
         println("start : ${LocalDateTime.now()}")
         try {// 100개 31초정도 걸림 & 리스트 서치 시간이 10초 정도

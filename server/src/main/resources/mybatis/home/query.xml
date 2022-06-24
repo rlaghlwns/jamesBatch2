@@ -172,7 +172,7 @@
 
         prop3.property_value enc_type
         ,prop2.property_value boundary
-        ,prop.property_value::text has_atc
+        ,coalesce(prop.property_value::boolean,false) has_atc
         ,split_part(encode(mail_bytes, 'escape'),split_part(split_part(encode(header_bytes, 'escape'), 'boundary="', 2),'"',1),2) inner_mail
         ,encode(mail_bytes, 'escape') mail
         ,encode(header_bytes, 'escape') heade
@@ -196,15 +196,17 @@
 
         FROM
         public.james_mail mail
-        left join
+        left outer join
         (select * from public.james_mail_property where upper(property_local_name) = upper('boundary')) prop2
         on mail.mailbox_id = prop2.mailbox_id and mail.mail_uid = prop2.mail_uid
-        left join
+        left outer join
         (select * from public.james_mail_property where upper(property_local_name) = upper('Content-Transfer-Encoding')) prop3
         on mail.mailbox_id = prop3.mailbox_id and mail.mail_uid = prop3.mail_uid
-        ,(select * from public.james_mail_property where upper(property_local_name) = upper('HAS_ATTACHMENT')) prop
+        left outer join
+        (select * from public.james_mail_property where upper(property_local_name) = upper('HAS_ATTACHMENT')) prop
+        on mail.mailbox_id = prop.mailbox_id and mail.mail_uid = prop.mail_uid
         ,james_mailbox mailbox
-        where mail.mailbox_id = prop.mailbox_id and mail.mail_uid = prop.mail_uid
+        where 1=1
         and mail.mailbox_id = mailbox.mailbox_id
         and mail.mail_is_processed = false
         and process_stat = #{s}

@@ -19,8 +19,5 @@ class Service {
     fun mailProUpdate(result: WebMailVO) = dao.mailProUpdate(result)
     fun absenceUser(result: WebMailVO) = dao.absenceUser(result)
     fun selectFile(searchVo: WebMailVO) = dao.selectFile(searchVo)
-    fun test() {
-        dao.test()
-    }
 
 }
