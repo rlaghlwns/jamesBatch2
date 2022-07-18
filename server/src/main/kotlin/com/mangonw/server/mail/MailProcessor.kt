@@ -9,6 +9,8 @@ import org.apache.james.mime4j.parser.*
 import org.apache.james.mime4j.stream.BodyDescriptor
 import org.apache.james.mime4j.stream.Field
 import org.apache.james.mime4j.util.MimeUtil
+import org.simplejavamail.api.email.Email
+import org.simplejavamail.converter.EmailConverter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -17,8 +19,9 @@ import java.nio.charset.Charset
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.stream.Collectors
+import javax.mail.internet.MimeMessage
 import javax.xml.bind.DatatypeConverter
-import kotlin.collections.HashMap
+
 
 @Component
 class MailProcessor {
@@ -34,6 +37,17 @@ class MailProcessor {
 	suspend fun writeToFile2(s: String, processingList: List<WebMailVO>) {
 		for (result in processingList) {
 			try {
+
+				//val iss = ByteArrayInputStream(result.headerBytes)
+				//val email = EmailConverter.emlToMimeMessage(result.mail)
+				//email.fromRecipient
+				//email.subject
+				//email.plainText
+				//email.attachments
+				//email.embeddedImages
+				//email.headers
+
+
 				step = "데이터 가공 스케쥴러 id 칼럼 주입"
 				result.processStat = s
 
@@ -41,8 +55,15 @@ class MailProcessor {
 				getHeaderInfo(result)
 
 				step = "본문 세팅"
-				result.content = getDecodedContents(result)
-				result.byteContent = result.content.toByteArray()
+				if(result.systemMail != "Y") {
+					result.content = getDecodedContents(result)
+					result.byteContent = result.content.toByteArray()
+				} else {
+					result.content = result.mail
+					result.byteContent = result.mail.toByteArray()
+				}
+
+				//System.err.println(result.from)
 
 				step = "메일함 분류 코드 세팅"
 				result.mailboxDtlCd = getMailboxDtlCd(result)
@@ -287,7 +308,7 @@ class MailProcessor {
 			content = "내용 없음"
 		}
 		return content*/
-		return  if(result.isSimpleMail) {
+		var ccc = if(result.isSimpleMail) {
 			when(result.encType) {
 				ENC_B -> {
 					result.mail = result.mail.trim().cut("\r\n", "\t")
@@ -307,6 +328,34 @@ class MailProcessor {
 		else {
 			getDecodedContents2(result)
 		}
+
+		/* 남은 첨부 없나... */
+		//System.err.println(result.from)
+		if (result.from.contains("samsung.com")) {
+			if (result.mail.contains("Content-ID")) {
+				val contentB = result.mail.split(result.boundary)
+				contentB.forEach {
+					if(it.contains("Content-ID")) {
+						/*val iit = it.split("\r\n\r\n")
+						val cid = iit[0].split("Content-ID: <")[1].split(">")[0]
+						val extension = iit[0].split("Content-Type: ")[1].split("\r\n")[0].split("/")[1]
+						val src = "data:image/$extension;base64,${iit[1].replace("\r\n","").replace("\t","").replace(" ","")}"
+						val orgSrc = "cid:$cid"
+						ccc = ccc.replace(orgSrc,src)*/
+					}
+				}
+			}
+		}
+		if (result.from.contains("jcint.co.kr")) {
+			val handler = MailHandler2(1, result)
+			val parser = MimeStreamParser()
+			parser.setContentHandler(handler)
+			ByteArrayInputStream(result.mailBytes).use {
+				parser.parse(it)
+			}
+		}
+
+		return ccc
 	}
 
 	private fun getMailboxDtlCd(result: WebMailVO): String {
@@ -443,118 +492,112 @@ class MailProcessor {
 
 class MailHeaderHandler(private val i: Int, private val result: WebMailVO): ContentHandler {
 
+	private fun targetInit(bd: String): WebMailVO {
+		val vo = WebMailVO()
+		val from = bd.split("<")
+		var name = ""
+		var email = ""
+		if (from.size == 1) {
+			email = from[0].trim().cut("\t", "\r\n")
+		} else {
+			name = from[0].cut("\t", "\r\n", " ")
+			email = from[1].cut("\t", "\r\n", " ", ">")
+		}
+
+		val encoded = name.contains("=?") && name.contains("?=")
+		if (encoded) {
+			val charSet = name.split("?")[1]
+			val encSet = name.split("?")[2]
+			val f = "=?$charSet?$encSet?"
+			val bodyArr = name.cut("\t","\r\n"," ", f).split("?=")
+			if (encSet.equals("B", ignoreCase = true)) {
+				try {
+					name = ""
+					bodyArr.forEach {
+						name += Base64InputStream(ByteArrayInputStream(it.toByteArray()))
+							.bufferedReader(Charset.forName(charSet)).lines().collect(Collectors.joining())
+					}
+				} catch (e: java.lang.Exception) {}
+			} else if (encSet.equals("Q", ignoreCase = true)) {
+				try {
+					name = ""
+					bodyArr.forEach {
+						name += QuotedPrintableInputStream(ByteArrayInputStream(it.toByteArray()))
+							.bufferedReader(Charset.forName(charSet)).lines().collect(Collectors.joining())
+					}
+				} catch (e: java.lang.Exception) {}
+			}
+		}
+		vo.senderNm = name
+		vo.senderEmail = email
+		return vo
+	}
+
 	override fun field(field: Field?) {
-		//System.err.println("${i}. ContentHandler.field : " + field?.name + ":" + field?.body)
 		field?.let {
 			when(it.name) {
 				"From" -> {
-					result.from = it.body
-					val from = it.body.split("<")	// =?utf-8?B?6rmA7ZqM7KSA?= <sn16292@naver.com> -> =?utf-8?B?6rmA7ZqM7KSA?= , sn16292@naver.com>
-					var name = ""
-					val email: String
-					if (from.size == 1) {
-						email = from[0].trim().cut("\t", "\r\n")
-					} else {
-						name = from[0].trim().cut("\t", "\r\n")
-						email = from[1].trim().cut("\t", "\r\n", ">")
-					}
-					if (it.body.contains("=?") || it.body.contains("?=")) {
-						name = name.trim().cut(" ", "?=","\"")
-						if (name.contains("?B?")) {
-							name = name.cut("=?utf-8?B?", "=?UTF-8?B?")
-							try {
-								name = Base64InputStream(ByteArrayInputStream(name.toByteArray()))
-									.bufferedReader(Charset.forName("utf-8")).lines().collect(Collectors.joining())
-							} catch (e: Exception) {
-								e.printStackTrace()
-							}
-						} else if (name.contains("?Q?")) {
-							name = name.cut("=?utf-8?Q?", "=?UTF-8?Q?")
-							try {
-								name = QuotedPrintableInputStream(ByteArrayInputStream(name.toByteArray()))
-									.bufferedReader(Charset.forName("utf-8")).lines().collect(Collectors.joining())
-							} catch (e: Exception) {
-								e.printStackTrace()
-							}
-						}
-					}
-					result.senderNm = name
-					result.senderEmail = email
+					val target = targetInit(it.body)
+					result.senderNm = target.senderNm
+					result.senderEmail = target.senderEmail
 				}
 				"Subject" -> {
 					result.subject = it.body
-					if (it.body.contains("=?") && it.body.contains("?=")) {
-						val subjects = it.body.split("\r\n").toMutableList()
-						(0 until subjects.size).forEach { i ->
-							if(subjects[i].contains("=?") && subjects[i].contains("?=")) {
-								val subs = subjects[i].split("?").toMutableList()
-								val charSet = subs[1]
-								val encSet = subs[2]
-								val subText = subs[3]
-								if (encSet.equals("B", ignoreCase = true)) {
-									try {
-										subjects[i] = Base64InputStream(ByteArrayInputStream(subText.toByteArray()))
-											.bufferedReader(Charset.forName(charSet)).lines().collect(Collectors.joining())
-									} catch (e: java.lang.Exception) {
-										e.printStackTrace()
-									}
-								} else if (encSet.equals("Q", ignoreCase = true)) {
-									try {
-										subjects[i] = QuotedPrintableInputStream(ByteArrayInputStream(subText.toByteArray()))
-											.bufferedReader(Charset.forName(charSet)).lines().collect(Collectors.joining())
-									} catch (e: java.lang.Exception) {
-										e.printStackTrace()
-									}
-								}
-							}
+					val encoded = it.body.contains("=?") && it.body.contains("?=")
+					if(encoded) {
+						val subConf = it.body.contains(": ")
+						var subConfNm = ""
+						if(subConf) {
+							subConfNm = "${ it.body.split(": ")[0] }: "
 						}
-						if (subjects.size > 1) {
-							result.subject = ""
-							for (sub in subjects) {
-								result.subject += sub
-							}
-						} else {
-							result.subject = subjects[0]
+						val charSet = it.body.split("?")[1]
+						val encSet = it.body.split("?")[2]
+						val f = "=?$charSet?$encSet?"
+						if (encSet.equals("B", ignoreCase = true)) {
+							try {
+								val bodyArr = it.body.cut(subConfNm, f,"\t","\r\n"," ").split("?=")
+								var subj = ""
+								bodyArr.forEach {
+									subj += Base64InputStream(ByteArrayInputStream(it.toByteArray()))
+										.bufferedReader(Charset.forName(charSet)).lines().collect(Collectors.joining())
+								}
+								result.subject = subConfNm+subj
+								if(result.subject.contains("�")) {
+									result.subject = subConfNm+Base64InputStream(ByteArrayInputStream(it.body.cut(subConfNm, f,"\t","\r\n"," ","?=").toByteArray()))
+                                        .bufferedReader(Charset.forName(charSet)).lines().collect(Collectors.joining())
+								}
+							} catch (e: java.lang.Exception) {}
+						} else if (encSet.equals("Q", ignoreCase = true)) {
+							try {
+								val bodyArr = it.body.cut(subConfNm, f,"\t","\r\n"," ").split("?=")
+								var subj = ""
+								bodyArr.forEach {
+									subj += QuotedPrintableInputStream(ByteArrayInputStream(it.toByteArray()))
+										.bufferedReader(Charset.forName(charSet)).lines().collect(Collectors.joining())
+								}
+								result.subject = subConfNm+subj
+								if(result.subject.contains("�")) {
+									result.subject = subConfNm+QuotedPrintableInputStream(ByteArrayInputStream(it.body.cut(subConfNm, f,"\t","\r\n"," ","?=").toByteArray()))
+										.bufferedReader(Charset.forName(charSet)).lines().collect(Collectors.joining())
+								}
+							} catch (e: java.lang.Exception) {}
 						}
 					}
 				}
-				"Return-Path" -> result.returnPath = it.body
+				"Return-Path" -> {
+					if(it.body.isNullOrBlank() or it.body.equals("<>")) {
+						result.systemMail = "Y"
+					}
+					result.returnPath = it.body
+				}
 				"To" -> {
 					val list = ArrayList<WebMailVO>()
 					val targets = it.body.trim().cut("\t", "\r\n").split(",")
 					for (group in targets) {
-						val from = group.split("<")
-						var name = ""
-						var email: String
-						if (from.size == 1) {
-							email = from[0].trim().cut("\t", "\r\n")
-						} else {
-							name = from[0].trim().cut("\t", "\r\n")
-							email = from[1].trim().cut("\t", "\r\n", ">")
-						}
-						if (group.contains("=?") || group.contains("?=")) {
-							name = name.trim { it <= ' ' }.cut(" ", "?=","\"")
-							if (name.contains("?B?")) {
-								name = name.cut("=?utf-8?B?", "=?UTF-8?B?")
-								try {
-									name = Base64InputStream(ByteArrayInputStream(name.toByteArray()))
-										.bufferedReader(Charset.forName("utf-8")).lines().collect(Collectors.joining())
-								} catch (e: Exception) {
-									e.printStackTrace()
-								}
-							} else if (name.contains("?Q?")) {
-								name = name.cut("=?utf-8?Q?", "=?UTF-8?Q?")
-								try {
-									name = QuotedPrintableInputStream(ByteArrayInputStream(name.toByteArray()))
-										.bufferedReader(Charset.forName("utf-8")).lines().collect(Collectors.joining())
-								} catch (e: Exception) {
-									e.printStackTrace()
-								}
-							}
-						}
+						val target = targetInit(it.body)
 						val vo = WebMailVO()
-						vo.senderNm = name
-						vo.senderEmail = email
+						vo.senderNm = target.senderNm
+						vo.senderEmail = target.senderEmail
 						list.add(vo)
 					}
 
@@ -573,38 +616,10 @@ class MailHeaderHandler(private val i: Int, private val result: WebMailVO): Cont
 					val list = ArrayList<WebMailVO>()
 					val targets = it.body.trim().cut("\t", "\r\n").split(",")
 					for (group in targets) {
-						val from = group.split("<")
-						var name = ""
-						var email: String
-						if (from.size == 1) {
-							email = from[0].trim().cut("\t", "\r\n")
-						} else {
-							name = from[0].trim().cut("\t", "\r\n")
-							email = from[1].trim().cut("\t", "\r\n", ">")
-						}
-						if (group.contains("=?") || group.contains("?=")) {
-							name = name.trim { it <= ' ' }.cut(" ", "?=","\"")
-							if (name.contains("?B?")) {
-								name = name.cut("=?utf-8?B?", "=?UTF-8?B?")
-								try {
-									name = Base64InputStream(ByteArrayInputStream(name.toByteArray()))
-										.bufferedReader(Charset.forName("utf-8")).lines().collect(Collectors.joining())
-								} catch (e: Exception) {
-									e.printStackTrace()
-								}
-							} else if (name.contains("?Q?")) {
-								name = name.cut("=?utf-8?Q?", "=?UTF-8?Q?")
-								try {
-									name = QuotedPrintableInputStream(ByteArrayInputStream(name.toByteArray()))
-										.bufferedReader(Charset.forName("utf-8")).lines().collect(Collectors.joining())
-								} catch (e: Exception) {
-									e.printStackTrace()
-								}
-							}
-						}
+						val target = targetInit(it.body)
 						val vo = WebMailVO()
-						vo.senderNm = name
-						vo.senderEmail = email
+						vo.senderNm = target.senderNm
+						vo.senderEmail = target.senderEmail
 						list.add(vo)
 					}
 
@@ -623,38 +638,10 @@ class MailHeaderHandler(private val i: Int, private val result: WebMailVO): Cont
 					val list = ArrayList<WebMailVO>()
 					val targets = it.body.trim().cut("\t", "\r\n").split(",")
 					for (group in targets) {
-						val from = group.split("<")
-						var name = ""
-						var email: String
-						if (from.size == 1) {
-							email = from[0].trim().cut("\t", "\r\n")
-						} else {
-							name = from[0].trim().cut("\t", "\r\n")
-							email = from[1].trim().cut("\t", "\r\n", ">")
-						}
-						if (group.contains("=?") || group.contains("?=")) {
-							name = name.trim { it <= ' ' }.cut(" ", "?=","\"")
-							if (name.contains("?B?")) {
-								name = name.cut("=?utf-8?B?", "=?UTF-8?B?")
-								try {
-									name = Base64InputStream(ByteArrayInputStream(name.toByteArray()))
-										.bufferedReader(Charset.forName("utf-8")).lines().collect(Collectors.joining())
-								} catch (e: Exception) {
-									e.printStackTrace()
-								}
-							} else if (name.contains("?Q?")) {
-								name = name.cut("=?utf-8?Q?", "=?UTF-8?Q?")
-								try {
-									name = QuotedPrintableInputStream(ByteArrayInputStream(name.toByteArray()))
-										.bufferedReader(Charset.forName("utf-8")).lines().collect(Collectors.joining())
-								} catch (e: Exception) {
-									e.printStackTrace()
-								}
-							}
-						}
+						val target = targetInit(it.body)
 						val vo = WebMailVO()
-						vo.senderNm = name
-						vo.senderEmail = email
+						vo.senderNm = target.senderNm
+						vo.senderEmail = target.senderEmail
 						list.add(vo)
 					}
 
@@ -668,6 +655,9 @@ class MailHeaderHandler(private val i: Int, private val result: WebMailVO): Cont
 						if (i != list.size - 1) target += ", "
 					}
 					result.bcc = target
+				}
+				"Sendmail-UUID" -> {
+					result.uuid = it.body
 				}
 			}
 		}
@@ -695,7 +685,7 @@ class MailHeaderHandler(private val i: Int, private val result: WebMailVO): Cont
 		//System.err.println("${i}. ContentHandler.preamble : ")
 		ist?.let {
 			val ii = i+1
-			val handler: ContentHandler = MailHandler(ii, result)
+			val handler: ContentHandler = MailHeaderHandler(ii, result)
 			val parser = MimeStreamParser()
 			parser.setContentHandler(handler)
 			ist.use {
@@ -707,7 +697,7 @@ class MailHeaderHandler(private val i: Int, private val result: WebMailVO): Cont
 		//System.err.println("${i}. ContentHandler.epilogue : ")
 		ist?.let {
 			val ii = i+1
-			val handler: ContentHandler = MailHandler(ii, result)
+			val handler: ContentHandler = MailHeaderHandler(ii, result)
 			val parser = MimeStreamParser()
 			parser.setContentHandler(handler)
 			ist.use {
@@ -752,6 +742,9 @@ class MailHandler(private val i: Int, private val result: WebMailVO): ContentHan
 
 	var content = ""
 	override fun body(bd: BodyDescriptor?, ist: InputStream?) {
+
+		//System.err.println(bd?.mimeType)
+
 		bd?.mediaType?.let {
 			if (it == "text") {
 				bd.transferEncoding?.let { t ->
@@ -761,35 +754,40 @@ class MailHandler(private val i: Int, private val result: WebMailVO): ContentHan
 								val list = result.mail.split("--${result.boundary}")
 								var res = ""
 								list.forEach { l ->
-									if (l.contains("Content-Type: text", ignoreCase = true)) {
+									if (l.contains("Content-Type: text", ignoreCase = true) && l.contains("Content-Transfer-Encoding: quoted-printable", ignoreCase = true)) {
 										res = l.split("\r\n\r\n")[1].trim().cut("\r\n", "\t")
 										res = QuotedPrintableInputStream(ByteArrayInputStream(res.toByteArray())).reader(Charset.forName(bd.charset)).readText()
 									}
 								}
+								//System.err.println("ENC_QUOTED_PRINTABLE : single : $res")
 								res
 							}
 							else {
 								//QuotedPrintableInputStream(ist).bufferedReader(Charset.forName(bd.charset)).lines().collect(Collectors.joining())
-								QuotedPrintableInputStream(ist).reader(Charset.forName(bd.charset)).readText()
+								val res = QuotedPrintableInputStream(ist).reader(Charset.forName(bd.charset)).readText()
+								//System.err.println("ENC_QUOTED_PRINTABLE : !single : $res")
+								res
 							}
 						}
 						MimeUtil.ENC_BASE64 -> {
 							if (result.singlePart) {
-								System.err.println(result.mailUid)
-								System.err.println(result.mail)
 								val list = result.mail.split("--${result.boundary}")
 								var res = ""
 								list.forEach { l ->
-									if (l.contains("Content-Type: text", ignoreCase = true)) {
+									if (l.contains("Content-Type: text", ignoreCase = true) && l.contains("Content-Transfer-Encoding: base64", ignoreCase = true)) {
 										res = l.split("\r\n\r\n")[1].trim().cut("\r\n", "\t")
 										res = Base64InputStream(ByteArrayInputStream(res.toByteArray())).reader(Charset.forName(bd.charset)).readText()
 									}
 								}
-								res
+								res = res.replace("\r\n","")
+								//System.err.println("ENC_BASE64 : single : $res")
+								res.replace("\r\n","")
 							}
 							else {
 								//Base64InputStream(ist).bufferedReader(Charset.forName(bd.charset)).lines().collect(Collectors.joining())
-								Base64InputStream(ist).reader(Charset.forName(bd.charset)).readText()
+								val res = Base64InputStream(ist).reader(Charset.forName(bd.charset)).readText()
+								//System.err.println("ENC_BASE64 : !single : $res")
+								res
 							}
 						}
 						else -> {
@@ -799,19 +797,25 @@ class MailHandler(private val i: Int, private val result: WebMailVO): ContentHan
 								list.forEach { l ->
 									if (l.contains("Content-Type: text", ignoreCase = true)) {
 										res = l.split("\r\n\r\n")[1].trim().cut("\r\n", "\t")
-										res = BufferedReader(InputStreamReader(ByteArrayInputStream(res.toByteArray()))).lines().collect(Collectors.joining())
+										if(result.systemMail != "Y") {
+											res = BufferedReader(InputStreamReader(ByteArrayInputStream(res.toByteArray()))).lines().collect(Collectors.joining())
+										}
 									}
 								}
+								//System.err.println("else : single : $res")
 								res
 							}
 							else {
-								BufferedReader(InputStreamReader(ist)).lines().collect(Collectors.joining())
+								val res = BufferedReader(InputStreamReader(ist)).lines().collect(Collectors.joining())
+								//System.err.println("else : !single : $res")
+								res
 							}
 						}
 					}
 				}
 			}
 		}
+
 	}
 
 	override fun startMessage() {
@@ -871,6 +875,87 @@ class MailHandler(private val i: Int, private val result: WebMailVO): ContentHan
 			val stream = BufferedReader(isr).lines()
 			val s = stream.collect(Collectors.joining())
 			System.err.println("${i}. ContentHandler.raw : $s")
+		}
+	}
+
+	private fun String.cut(vararg str: String): String {
+		var result = this
+		str.forEach {
+			result = result.replace(it,"")
+		}
+		return result
+	}
+
+}
+
+class MailHandler2(private val i: Int, private val result: WebMailVO): ContentHandler {
+
+	override fun body(bd: BodyDescriptor?, ist: InputStream?) {
+		//System.err.println(result.boundary)
+		result.mail.split("--${result.boundary}").forEach {
+			if (it.contains("Content-Type: ")) {
+				it.split("Content-Type: ")[1].split(";")[0]
+			}
+		}
+	}
+
+	override fun startMessage() {
+		//System.err.println("${i}. ContentHandler.startMessage")
+	}
+	override fun endMessage() {
+		//System.err.println("${i}. ContentHandler.endMessage")
+	}
+	override fun startBodyPart() {
+		//System.err.println("${i}. ContentHandler.startBodyPart")
+	}
+	override fun endBodyPart() {
+		//System.err.println("${i}. ContentHandler.endBodyPart")
+	}
+	override fun startHeader() {
+		//System.err.println("${i}. ContentHandler.startHeader")
+	}
+	override fun field(field: Field?) {
+		//System.err.println("${i}. ContentHandler.field : " + field?.name + ":" + field?.body)
+	}
+	override fun endHeader() {
+		//System.err.println("${i}. ContentHandler.endHeader")
+	}
+	override fun preamble(ist: InputStream?) { // 전문
+		//System.err.println("${i}. ContentHandler.preamble : ")
+		ist?.let {
+			val ii = i+1
+			val handler: ContentHandler = MailHandler(ii, result)
+			val parser = MimeStreamParser()
+			parser.setContentHandler(handler)
+			ist.use {
+				parser.parse(it)
+			}
+		}
+	}
+	override fun epilogue(ist: InputStream?) { // 발문
+		//System.err.println("${i}. ContentHandler.epilogue : ")
+		ist?.let {
+			val ii = i+1
+			val handler: ContentHandler = MailHandler(ii, result)
+			val parser = MimeStreamParser()
+			parser.setContentHandler(handler)
+			ist.use {
+				parser.parse(it)
+			}
+		}
+	}
+	override fun startMultipart(bd: BodyDescriptor?) {
+		//System.err.println("${i}. ContentHandler.startMultipart")
+	}
+	override fun endMultipart() {
+		//System.err.println("${i}. ContentHandler.endMultipart")
+	}
+	override fun raw(ist: InputStream?) {
+		ist?.let {
+			val isr = InputStreamReader(ist)
+			val stream = BufferedReader(isr).lines()
+			val s = stream.collect(Collectors.joining())
+			//System.err.println("${i}. ContentHandler.raw : $s")
 		}
 	}
 

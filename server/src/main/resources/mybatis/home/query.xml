@@ -138,8 +138,248 @@
         ;
     </update>
 
-    <select id="selectNotProcessedMail" resultMap="webMailVo">
+    <sql id="test">
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 6931 and mail_uid = 6; delete from mail_data where mailbox_id = 6931 and mail_uid = 6; delete from mail_data_error where mailbox_id = 6931 and mail_uid = 6; delete from mail_atc where mailbox_id = 6931 and mail_uid = 6;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4089 and mail_uid = 6; delete from mail_data where mailbox_id = 4089 and mail_uid = 6; delete from mail_data_error where mailbox_id = 4089 and mail_uid = 6; delete from mail_atc where mailbox_id = 4089 and mail_uid = 6;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 10629 and mail_uid = 8; delete from mail_data where mailbox_id = 10629 and mail_uid = 8; delete from mail_data_error where mailbox_id = 10629 and mail_uid = 8; delete from mail_atc where mailbox_id = 10629 and mail_uid = 8;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 6937 and mail_uid = 28; delete from mail_data where mailbox_id = 6937 and mail_uid = 28; delete from mail_data_error where mailbox_id = 6937 and mail_uid = 28; delete from mail_atc where mailbox_id = 6937 and mail_uid = 28;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 6933 and mail_uid = 5; delete from mail_data where mailbox_id = 6933 and mail_uid = 5; delete from mail_data_error where mailbox_id = 6933 and mail_uid = 5; delete from mail_atc where mailbox_id = 6933 and mail_uid = 5;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 10016 and mail_uid = 3; delete from mail_data where mailbox_id = 10016 and mail_uid = 3; delete from mail_data_error where mailbox_id = 10016 and mail_uid = 3; delete from mail_atc where mailbox_id = 10016 and mail_uid = 3;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 10016 and mail_uid = 4; delete from mail_data where mailbox_id = 10016 and mail_uid = 4; delete from mail_data_error where mailbox_id = 10016 and mail_uid = 4; delete from mail_atc where mailbox_id = 10016 and mail_uid = 4;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4862 and mail_uid = 3; delete from mail_data where mailbox_id = 4862 and mail_uid = 3; delete from mail_data_error where mailbox_id = 4862 and mail_uid = 3; delete from mail_atc where mailbox_id = 4862 and mail_uid = 3;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 10016 and mail_uid = 5; delete from mail_data where mailbox_id = 10016 and mail_uid = 5; delete from mail_data_error where mailbox_id = 10016 and mail_uid = 5; delete from mail_atc where mailbox_id = 10016 and mail_uid = 5;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4086 and mail_uid = 10; delete from mail_data where mailbox_id = 4086 and mail_uid = 10; delete from mail_data_error where mailbox_id = 4086 and mail_uid = 10; delete from mail_atc where mailbox_id = 4086 and mail_uid = 10;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 3756 and mail_uid = 8; delete from mail_data where mailbox_id = 3756 and mail_uid = 8; delete from mail_data_error where mailbox_id = 3756 and mail_uid = 8; delete from mail_atc where mailbox_id = 3756 and mail_uid = 8;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4080 and mail_uid = 16; delete from mail_data where mailbox_id = 4080 and mail_uid = 16; delete from mail_data_error where mailbox_id = 4080 and mail_uid = 16; delete from mail_atc where mailbox_id = 4080 and mail_uid = 16;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4080 and mail_uid = 29; delete from mail_data where mailbox_id = 4080 and mail_uid = 29; delete from mail_data_error where mailbox_id = 4080 and mail_uid = 29; delete from mail_atc where mailbox_id = 4080 and mail_uid = 29;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4080 and mail_uid = 7; delete from mail_data where mailbox_id = 4080 and mail_uid = 7; delete from mail_data_error where mailbox_id = 4080 and mail_uid = 7; delete from mail_atc where mailbox_id = 4080 and mail_uid = 7;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4080 and mail_uid = 13; delete from mail_data where mailbox_id = 4080 and mail_uid = 13; delete from mail_data_error where mailbox_id = 4080 and mail_uid = 13; delete from mail_atc where mailbox_id = 4080 and mail_uid = 13;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4080 and mail_uid = 14; delete from mail_data where mailbox_id = 4080 and mail_uid = 14; delete from mail_data_error where mailbox_id = 4080 and mail_uid = 14; delete from mail_atc where mailbox_id = 4080 and mail_uid = 14;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4080 and mail_uid = 15; delete from mail_data where mailbox_id = 4080 and mail_uid = 15; delete from mail_data_error where mailbox_id = 4080 and mail_uid = 15; delete from mail_atc where mailbox_id = 4080 and mail_uid = 15;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 10906 and mail_uid = 16; delete from mail_data where mailbox_id = 10906 and mail_uid = 16; delete from mail_data_error where mailbox_id = 10906 and mail_uid = 16; delete from mail_atc where mailbox_id = 10906 and mail_uid = 16;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4868 and mail_uid = 6; delete from mail_data where mailbox_id = 4868 and mail_uid = 6; delete from mail_data_error where mailbox_id = 4868 and mail_uid = 6; delete from mail_atc where mailbox_id = 4868 and mail_uid = 6;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4859 and mail_uid = 9; delete from mail_data where mailbox_id = 4859 and mail_uid = 9; delete from mail_data_error where mailbox_id = 4859 and mail_uid = 9; delete from mail_atc where mailbox_id = 4859 and mail_uid = 9;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4085 and mail_uid = 5; delete from mail_data where mailbox_id = 4085 and mail_uid = 5; delete from mail_data_error where mailbox_id = 4085 and mail_uid = 5; delete from mail_atc where mailbox_id = 4085 and mail_uid = 5;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4058 and mail_uid = 34; delete from mail_data where mailbox_id = 4058 and mail_uid = 34; delete from mail_data_error where mailbox_id = 4058 and mail_uid = 34; delete from mail_atc where mailbox_id = 4058 and mail_uid = 34;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4086 and mail_uid = 21; delete from mail_data where mailbox_id = 4086 and mail_uid = 21; delete from mail_data_error where mailbox_id = 4086 and mail_uid = 21; delete from mail_atc where mailbox_id = 4086 and mail_uid = 21;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 10008 and mail_uid = 6; delete from mail_data where mailbox_id = 10008 and mail_uid = 6; delete from mail_data_error where mailbox_id = 10008 and mail_uid = 6; delete from mail_atc where mailbox_id = 10008 and mail_uid = 6;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 6934 and mail_uid = 9; delete from mail_data where mailbox_id = 6934 and mail_uid = 9; delete from mail_data_error where mailbox_id = 6934 and mail_uid = 9; delete from mail_atc where mailbox_id = 6934 and mail_uid = 9;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4090 and mail_uid = 20; delete from mail_data where mailbox_id = 4090 and mail_uid = 20; delete from mail_data_error where mailbox_id = 4090 and mail_uid = 20; delete from mail_atc where mailbox_id = 4090 and mail_uid = 20;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 10606 and mail_uid = 19; delete from mail_data where mailbox_id = 10606 and mail_uid = 19; delete from mail_data_error where mailbox_id = 10606 and mail_uid = 19; delete from mail_atc where mailbox_id = 10606 and mail_uid = 19;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 6934 and mail_uid = 15; delete from mail_data where mailbox_id = 6934 and mail_uid = 15; delete from mail_data_error where mailbox_id = 6934 and mail_uid = 15; delete from mail_atc where mailbox_id = 6934 and mail_uid = 15;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 10629 and mail_uid = 9; delete from mail_data where mailbox_id = 10629 and mail_uid = 9; delete from mail_data_error where mailbox_id = 10629 and mail_uid = 9; delete from mail_atc where mailbox_id = 10629 and mail_uid = 9;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 10607 and mail_uid = 8; delete from mail_data where mailbox_id = 10607 and mail_uid = 8; delete from mail_data_error where mailbox_id = 10607 and mail_uid = 8; delete from mail_atc where mailbox_id = 10607 and mail_uid = 8;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4089 and mail_uid = 15; delete from mail_data where mailbox_id = 4089 and mail_uid = 15; delete from mail_data_error where mailbox_id = 4089 and mail_uid = 15; delete from mail_atc where mailbox_id = 4089 and mail_uid = 15;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4090 and mail_uid = 13; delete from mail_data where mailbox_id = 4090 and mail_uid = 13; delete from mail_data_error where mailbox_id = 4090 and mail_uid = 13; delete from mail_atc where mailbox_id = 4090 and mail_uid = 13;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 3756 and mail_uid = 14; delete from mail_data where mailbox_id = 3756 and mail_uid = 14; delete from mail_data_error where mailbox_id = 3756 and mail_uid = 14; delete from mail_atc where mailbox_id = 3756 and mail_uid = 14;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 10926 and mail_uid = 7; delete from mail_data where mailbox_id = 10926 and mail_uid = 7; delete from mail_data_error where mailbox_id = 10926 and mail_uid = 7; delete from mail_atc where mailbox_id = 10926 and mail_uid = 7;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 3756 and mail_uid = 5; delete from mail_data where mailbox_id = 3756 and mail_uid = 5; delete from mail_data_error where mailbox_id = 3756 and mail_uid = 5; delete from mail_atc where mailbox_id = 3756 and mail_uid = 5;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4080 and mail_uid = 34; delete from mail_data where mailbox_id = 4080 and mail_uid = 34; delete from mail_data_error where mailbox_id = 4080 and mail_uid = 34; delete from mail_atc where mailbox_id = 4080 and mail_uid = 34;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 3756 and mail_uid = 7; delete from mail_data where mailbox_id = 3756 and mail_uid = 7; delete from mail_data_error where mailbox_id = 3756 and mail_uid = 7; delete from mail_atc where mailbox_id = 3756 and mail_uid = 7;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4086 and mail_uid = 28; delete from mail_data where mailbox_id = 4086 and mail_uid = 28; delete from mail_data_error where mailbox_id = 4086 and mail_uid = 28; delete from mail_atc where mailbox_id = 4086 and mail_uid = 28;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 10906 and mail_uid = 6; delete from mail_data where mailbox_id = 10906 and mail_uid = 6; delete from mail_data_error where mailbox_id = 10906 and mail_uid = 6; delete from mail_atc where mailbox_id = 10906 and mail_uid = 6;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4058 and mail_uid = 21; delete from mail_data where mailbox_id = 4058 and mail_uid = 21; delete from mail_data_error where mailbox_id = 4058 and mail_uid = 21; delete from mail_atc where mailbox_id = 4058 and mail_uid = 21;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4058 and mail_uid = 28; delete from mail_data where mailbox_id = 4058 and mail_uid = 28; delete from mail_data_error where mailbox_id = 4058 and mail_uid = 28; delete from mail_atc where mailbox_id = 4058 and mail_uid = 28;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 6934 and mail_uid = 3; delete from mail_data where mailbox_id = 6934 and mail_uid = 3; delete from mail_data_error where mailbox_id = 6934 and mail_uid = 3; delete from mail_atc where mailbox_id = 6934 and mail_uid = 3;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 6934 and mail_uid = 7; delete from mail_data where mailbox_id = 6934 and mail_uid = 7; delete from mail_data_error where mailbox_id = 6934 and mail_uid = 7; delete from mail_atc where mailbox_id = 6934 and mail_uid = 7;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4865 and mail_uid = 2; delete from mail_data where mailbox_id = 4865 and mail_uid = 2; delete from mail_data_error where mailbox_id = 4865 and mail_uid = 2; delete from mail_atc where mailbox_id = 4865 and mail_uid = 2;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 6937 and mail_uid = 9; delete from mail_data where mailbox_id = 6937 and mail_uid = 9; delete from mail_data_error where mailbox_id = 6937 and mail_uid = 9; delete from mail_atc where mailbox_id = 6937 and mail_uid = 9;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 6937 and mail_uid = 10; delete from mail_data where mailbox_id = 6937 and mail_uid = 10; delete from mail_data_error where mailbox_id = 6937 and mail_uid = 10; delete from mail_atc where mailbox_id = 6937 and mail_uid = 10;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 10008 and mail_uid = 2; delete from mail_data where mailbox_id = 10008 and mail_uid = 2; delete from mail_data_error where mailbox_id = 10008 and mail_uid = 2; delete from mail_atc where mailbox_id = 10008 and mail_uid = 2;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 10008 and mail_uid = 5; delete from mail_data where mailbox_id = 10008 and mail_uid = 5; delete from mail_data_error where mailbox_id = 10008 and mail_uid = 5; delete from mail_atc where mailbox_id = 10008 and mail_uid = 5;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 3770 and mail_uid = 7; delete from mail_data where mailbox_id = 3770 and mail_uid = 7; delete from mail_data_error where mailbox_id = 3770 and mail_uid = 7; delete from mail_atc where mailbox_id = 3770 and mail_uid = 7;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4864 and mail_uid = 9; delete from mail_data where mailbox_id = 4864 and mail_uid = 9; delete from mail_data_error where mailbox_id = 4864 and mail_uid = 9; delete from mail_atc where mailbox_id = 4864 and mail_uid = 9;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 6931 and mail_uid = 9; delete from mail_data where mailbox_id = 6931 and mail_uid = 9; delete from mail_data_error where mailbox_id = 6931 and mail_uid = 9; delete from mail_atc where mailbox_id = 6931 and mail_uid = 9;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 10629 and mail_uid = 6; delete from mail_data where mailbox_id = 10629 and mail_uid = 6; delete from mail_data_error where mailbox_id = 10629 and mail_uid = 6; delete from mail_atc where mailbox_id = 10629 and mail_uid = 6;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 6934 and mail_uid = 19; delete from mail_data where mailbox_id = 6934 and mail_uid = 19; delete from mail_data_error where mailbox_id = 6934 and mail_uid = 19; delete from mail_atc where mailbox_id = 6934 and mail_uid = 19;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4094 and mail_uid = 8; delete from mail_data where mailbox_id = 4094 and mail_uid = 8; delete from mail_data_error where mailbox_id = 4094 and mail_uid = 8; delete from mail_atc where mailbox_id = 4094 and mail_uid = 8;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 10605 and mail_uid = 14; delete from mail_data where mailbox_id = 10605 and mail_uid = 14; delete from mail_data_error where mailbox_id = 10605 and mail_uid = 14; delete from mail_atc where mailbox_id = 10605 and mail_uid = 14;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 10008 and mail_uid = 11; delete from mail_data where mailbox_id = 10008 and mail_uid = 11; delete from mail_data_error where mailbox_id = 10008 and mail_uid = 11; delete from mail_atc where mailbox_id = 10008 and mail_uid = 11;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 10906 and mail_uid = 17; delete from mail_data where mailbox_id = 10906 and mail_uid = 17; delete from mail_data_error where mailbox_id = 10906 and mail_uid = 17; delete from mail_atc where mailbox_id = 10906 and mail_uid = 17;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 10611 and mail_uid = 3; delete from mail_data where mailbox_id = 10611 and mail_uid = 3; delete from mail_data_error where mailbox_id = 10611 and mail_uid = 3; delete from mail_atc where mailbox_id = 10611 and mail_uid = 3;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 6937 and mail_uid = 31; delete from mail_data where mailbox_id = 6937 and mail_uid = 31; delete from mail_data_error where mailbox_id = 6937 and mail_uid = 31; delete from mail_atc where mailbox_id = 6937 and mail_uid = 31;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4860 and mail_uid = 24; delete from mail_data where mailbox_id = 4860 and mail_uid = 24; delete from mail_data_error where mailbox_id = 4860 and mail_uid = 24; delete from mail_atc where mailbox_id = 4860 and mail_uid = 24;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 10905 and mail_uid = 26; delete from mail_data where mailbox_id = 10905 and mail_uid = 26; delete from mail_data_error where mailbox_id = 10905 and mail_uid = 26; delete from mail_atc where mailbox_id = 10905 and mail_uid = 26;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 10906 and mail_uid = 14; delete from mail_data where mailbox_id = 10906 and mail_uid = 14; delete from mail_data_error where mailbox_id = 10906 and mail_uid = 14; delete from mail_atc where mailbox_id = 10906 and mail_uid = 14;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 6937 and mail_uid = 33; delete from mail_data where mailbox_id = 6937 and mail_uid = 33; delete from mail_data_error where mailbox_id = 6937 and mail_uid = 33; delete from mail_atc where mailbox_id = 6937 and mail_uid = 33;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4094 and mail_uid = 16; delete from mail_data where mailbox_id = 4094 and mail_uid = 16; delete from mail_data_error where mailbox_id = 4094 and mail_uid = 16; delete from mail_atc where mailbox_id = 4094 and mail_uid = 16;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 10906 and mail_uid = 15; delete from mail_data where mailbox_id = 10906 and mail_uid = 15; delete from mail_data_error where mailbox_id = 10906 and mail_uid = 15; delete from mail_atc where mailbox_id = 10906 and mail_uid = 15;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4090 and mail_uid = 35; delete from mail_data where mailbox_id = 4090 and mail_uid = 35; delete from mail_data_error where mailbox_id = 4090 and mail_uid = 35; delete from mail_atc where mailbox_id = 4090 and mail_uid = 35;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4090 and mail_uid = 36; delete from mail_data where mailbox_id = 4090 and mail_uid = 36; delete from mail_data_error where mailbox_id = 4090 and mail_uid = 36; delete from mail_atc where mailbox_id = 4090 and mail_uid = 36;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 3756 and mail_uid = 16; delete from mail_data where mailbox_id = 3756 and mail_uid = 16; delete from mail_data_error where mailbox_id = 3756 and mail_uid = 16; delete from mail_atc where mailbox_id = 3756 and mail_uid = 16;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 10905 and mail_uid = 28; delete from mail_data where mailbox_id = 10905 and mail_uid = 28; delete from mail_data_error where mailbox_id = 10905 and mail_uid = 28; delete from mail_atc where mailbox_id = 10905 and mail_uid = 28;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 10926 and mail_uid = 8; delete from mail_data where mailbox_id = 10926 and mail_uid = 8; delete from mail_data_error where mailbox_id = 10926 and mail_uid = 8; delete from mail_atc where mailbox_id = 10926 and mail_uid = 8;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 3759 and mail_uid = 13; delete from mail_data where mailbox_id = 3759 and mail_uid = 13; delete from mail_data_error where mailbox_id = 3759 and mail_uid = 13; delete from mail_atc where mailbox_id = 3759 and mail_uid = 13;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 4058 and mail_uid = 44; delete from mail_data where mailbox_id = 4058 and mail_uid = 44; delete from mail_data_error where mailbox_id = 4058 and mail_uid = 44; delete from mail_atc where mailbox_id = 4058 and mail_uid = 44;
+        update james_mail set mail_is_processed = false, process_stat = '1234' where mailbox_id = 10008 and mail_uid = 12; delete from mail_data where mailbox_id = 10008 and mail_uid = 12; delete from mail_data_error where mailbox_id = 10008 and mail_uid = 12; delete from mail_atc where mailbox_id = 10008 and mail_uid = 12;
+    </sql>
 
+    <sql id="test2">
+        and (mail.mailbox_id, mail.mail_uid) in (
+        (6931,6),
+        (4089,6),
+        (10629,8),
+        (6937,28),
+        (6933,5),
+        (10016,3),
+        (10016,4),
+        (4862,3),
+        (10016,5),
+        (4086,10),
+        (3756,8),
+        (4080,16),
+        (4080,29),
+        (4080,7),
+        (4080,13),
+        (4080,14),
+        (4080,15),
+        (10906,16),
+        (4868,6),
+        (4859,9),
+        (4085,5),
+        (4058,34),
+        (4086,21),
+        (10008,6),
+        (6934,9),
+        (4090,20),
+        (10606,19),
+        (6934,15),
+        (10629,9),
+        (10607,8),
+        (4089,15),
+        (4090,13),
+        (3756,14),
+        (10926,7),
+        (3756,5),
+        (4080,34),
+        (3756,7),
+        (4086,28),
+        (10906,6),
+        (4058,21),
+        (4058,28),
+        (6934,3),
+        (6934,7),
+        (4865,2),
+        (6937,9),
+        (6937,10),
+        (10008,2),
+        (10008,5),
+        (3770,7),
+        (4864,9),
+        (6931,9),
+        (10629,6),
+        (6934,19),
+        (4094,8),
+        (10605,14),
+        (10008,11),
+        (10906,17),
+        (10611,3),
+        (6937,31),
+        (4860,24),
+        (10905,26),
+        (10906,14),
+        (6937,33),
+        (4094,16),
+        (10906,15),
+        (4090,35),
+        (4090,36),
+        (3756,16),
+        (10905,28),
+        (10926,8),
+        (3759,13),
+        (4058,44),
+        (10008,12)
+        )
+    </sql>
+
+    <select id="selectNotProcessedMail" resultMap="webMailVo">
+        <include refid="test" />
+        
+        select
+
+        mail.mail
+        ,mail.heade
+        ,mail.boundary
+
+        ,mail.mail_is_seen
+        ,mail.mail_is_deleted
+        ,mail.has_atc
+
+        ,mail.mailbox_id
+        ,mail.mail_uid
+
+        ,mail.mail_date
+
+        ,mail.mail_is_answered
+        ,mail.mail_bytes
+        ,mail.header_bytes
+        ,retr.retrieval_target
+
+        ,mail.mailbox_name
+        ,mail.user_name
+
+        ,mail.enc_type
+
+        ,replace(split_part(encode(mail.header_bytes,'escape'),'Subject: ',2),'	','') subjects
+        ,row_number() over(order by mail_date) rn
+        from(
+        SELECT
+
+        prop3.property_value enc_type
+        ,prop2.property_value boundary
+        ,coalesce(prop.property_value::boolean,false) has_atc
+        ,split_part(encode(mail_bytes, 'escape'),split_part(split_part(encode(header_bytes, 'escape'), 'boundary="', 2),'"',1),2) inner_mail
+        ,encode(mail_bytes, 'escape') mail
+        ,encode(header_bytes, 'escape') heade
+
+        ,mail_is_seen::text mail_is_seen
+
+        ,mail.mailbox_id
+        ,mail.mail_uid
+
+        ,mail.mail_is_answered
+
+        ,mail.mail_date
+
+        ,mail.mail_bytes
+        ,mail.header_bytes
+
+        ,mail.mail_uid uid
+        ,mail.mail_is_deleted
+        ,mailbox.mailbox_name
+        ,mailbox.user_name
+
+        FROM
+        public.james_mail mail
+        left outer join
+        (select * from public.james_mail_property where upper(property_local_name) = upper('boundary')) prop2
+        on mail.mailbox_id = prop2.mailbox_id and mail.mail_uid = prop2.mail_uid
+        left outer join
+        (select * from public.james_mail_property where upper(property_local_name) = upper('Content-Transfer-Encoding')) prop3
+        on mail.mailbox_id = prop3.mailbox_id and mail.mail_uid = prop3.mail_uid
+        left outer join
+        (select * from public.james_mail_property where upper(property_local_name) = upper('HAS_ATTACHMENT')) prop
+        on mail.mailbox_id = prop.mailbox_id and mail.mail_uid = prop.mail_uid
+        ,james_mailbox mailbox
+        where 1=1
+        and mail.mailbox_id = mailbox.mailbox_id
+        and mail.mail_is_processed = false
+        and process_stat = '1234'
+        <include refid="test2" />
+        )mail
+        left join
+        (
+        SELECT
+        mail.mailbox_id, mail.mail_uid uid, string_agg(prop.mailbox_id||','||prop.mail_uid,'and') retrieval_target
+        FROM public.james_mail mail ,public.james_mail_property prop
+        where mail.mailbox_id != prop.mailbox_id and prop.property_local_name = 'boundary' and prop.property_value = split_part(split_part(encode(header_bytes, 'escape'), 'boundary="', 2),'"',1)
+        group by mail.mailbox_id, mail.mail_uid
+        )retr
+        on mail.uid = retr.uid and mail.mailbox_id = retr.mailbox_id
+        order by mail_date
+    </select>
+
+    <select id="selectNotProcessedMail_back" resultMap="webMailVo">
         select
 
         mail.mail
@@ -304,6 +544,12 @@
     </insert>
 
     <insert id="mailDataProcessing">
+        <if test=" uuid != null and uuid != '' ">
+
+
+
+            delete from mail_data where process_stat = #{uuid};
+        </if>
         INSERT INTO public.mail_data
         (
         mailbox_id,

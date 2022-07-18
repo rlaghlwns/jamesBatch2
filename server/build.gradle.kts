@@ -44,6 +44,11 @@ dependencies {
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.5.0")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-rx3:1.5.0")
 
+	// JAX-B dependencies for JDK 9+
+	implementation ("jakarta.xml.bind:jakarta.xml.bind-api:2.3.2")
+	implementation ("org.glassfish.jaxb:jaxb-runtime:2.3.2")
+
+	implementation("org.simplejavamail:simple-java-mail:7.2.0")
 }
 
 tasks.withType<KotlinCompile> {
